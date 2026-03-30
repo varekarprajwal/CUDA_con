@@ -1,0 +1,105 @@
+Image,Sequential(ms),MPI(ms),CUDA(ms),MPI Speedup,MPI Efficiency(%),CUDA Speedup,CUDA Efficiency(%)
+***********************************************************************
+./build/serial Data/test/test_16384x16384.png
+Loaded image size: 16384x16384
+Running im2col...
+***********************************************************************
+./build/serial Data/test/test_512x512.png
+Loaded image size: 512x512
+Running im2col...
+Running GEMM...
+Success! Saved output to convolution_output.jpg
+
+Elapsed time for im2col Transformation : 49.0086 milliseconds
+Elapsed time for Matrix Multiplication : 68.9198 milliseconds
+Total Elapsed time : 117.9284 milliseconds
+***********************************************************************
+./build/serial Data/test/test_2048x2048.png
+Loaded image size: 2048x2048
+Running im2col...
+Running GEMM...
+Success! Saved output to convolution_output.jpg
+
+Elapsed time for im2col Transformation : 792.4054 milliseconds
+Elapsed time for Matrix Multiplication : 1140.2957 milliseconds
+Total Elapsed time : 1932.7011 milliseconds
+***********************************************************************
+./build/serial Data/test/test_32x32.png
+Loaded image size: 32x32
+Running im2col...
+Running GEMM...
+Success! Saved output to convolution_output.jpg
+
+Elapsed time for im2col Transformation : 0.1641 milliseconds
+Elapsed time for Matrix Multiplication : 0.2359 milliseconds
+Total Elapsed time : 0.4000 milliseconds
+***********************************************************************
+./build/serial Data/test/test_128x128.png
+Loaded image size: 128x128
+Running im2col...
+Running GEMM...
+Success! Saved output to convolution_output.jpg
+
+Elapsed time for im2col Transformation : 3.0621 milliseconds
+Elapsed time for Matrix Multiplication : 4.2311 milliseconds
+Total Elapsed time : 7.2932 milliseconds
+***********************************************************************
+./build/serial Data/test/test_64x64.png
+Loaded image size: 64x64
+Running im2col...
+Running GEMM...
+Success! Saved output to convolution_output.jpg
+
+Elapsed time for im2col Transformation : 0.7383 milliseconds
+Elapsed time for Matrix Multiplication : 1.0037 milliseconds
+Total Elapsed time : 1.7420 milliseconds
+***********************************************************************
+./build/serial Data/test/test_4096x4096.png
+Loaded image size: 4096x4096
+Running im2col...
+Running GEMM...
+Success! Saved output to convolution_output.jpg
+
+Elapsed time for im2col Transformation : 3230.4936 milliseconds
+Elapsed time for Matrix Multiplication : 4804.0698 milliseconds
+Total Elapsed time : 8034.5634 milliseconds
+***********************************************************************
+./build/serial Data/test/test_16x16.png
+Loaded image size: 16x16
+Running im2col...
+Running GEMM...
+Success! Saved output to convolution_output.jpg
+
+Elapsed time for im2col Transformation : 0.0401 milliseconds
+Elapsed time for Matrix Multiplication : 0.0504 milliseconds
+Total Elapsed time : 0.0905 milliseconds
+***********************************************************************
+./build/serial Data/test/test_8192x8192.png
+Loaded image size: 8192x8192
+Running im2col...
+Running GEMM...
+Success! Saved output to convolution_output.jpg
+
+Elapsed time for im2col Transformation : 12821.1151 milliseconds
+Elapsed time for Matrix Multiplication : 18661.7006 milliseconds
+Total Elapsed time : 31482.8157 milliseconds
+***********************************************************************
+./build/serial Data/test/test_256x256.png
+Loaded image size: 256x256
+Running im2col...
+Running GEMM...
+Success! Saved output to convolution_output.jpg
+
+Elapsed time for im2col Transformation : 12.2924 milliseconds
+Elapsed time for Matrix Multiplication : 17.0842 milliseconds
+Total Elapsed time : 29.3766 milliseconds
+***********************************************************************
+./build/serial Data/test/test_1024x1024.png
+Loaded image size: 1024x1024
+Running im2col...
+Running GEMM...
+Success! Saved output to convolution_output.jpg
+
+Elapsed time for im2col Transformation : 196.3238 milliseconds
+Elapsed time for Matrix Multiplication : 279.2266 milliseconds
+Total Elapsed time : 475.5504 milliseconds
