@@ -1,6 +1,8 @@
 # ============================
 # Compiler settings
 # ============================
+MPICC    = mpiicpc
+MPICXX   = mpicxx
 GCC      = g++
 NVCC     = nvcc
 
@@ -29,14 +31,26 @@ VTUNE_RESULT_DIR = vtune_results
 # ============================
 # Source files
 # ============================
-SEQ_SRC           = $(SRC_DIR)/sequential/Sequential_OPENCV.cpp
+MPI_SRC           = src/tests/Parallel_MPI_OPENCV.cpp#$(SRC_DIR)/mpi/Parallel_MPI_OPENCV.cpp
+OMP_SRC           = $(SRC_DIR)/mpi/Parallel_OpenMP_OPENCV.cpp
+MPI_OPT_SRC       = $(SRC_DIR)/hybrid/MPI_OpenMP_OPENCV.cpp
+SEQ_SRC           = $(SRC_DIR)/Sequential_con.cpp
 CUDA_SRC          = $(SRC_DIR)/cuda/parallel_CUDA_OPENCV.cu #src/tests/parallel_CUDA_OPENCV.cu
+SM_CUDA_SRC       = $(SRC_DIR)/cuda/P_SM.cu
+HYBRID_SRC        = $(SRC_DIR)/hybrid/Hybrid_MPI_OpenMP_CUDA.cpp
+TEXTON_HYBRID_SRC = $(SRC_DIR)/hybrid/MPI_OpenMP_OPENCV.cpp  # Ensure this is correct
 
 # ============================
 # Executables
 # ============================
+MPI_EXEC           = build/mpi_parallel
+OMP_EXEC           = build/omp_parallel
+MPI_OPT_EXEC       = build/parallel_optimized
 SEQ_EXEC           = build/serial
 CUDA_EXEC          = build/cuda_parallel
+CUDA_SM_EXEC       = build/cuda_shared
+HYBRID_EXEC        = build/hybrid_executable
+TEXTON_HYBRID_EXEC = build/texton_hybrid
 
 # ============================
 # Configurable variables
@@ -52,7 +66,7 @@ IMAGE ?= $(IMAGE_DIR)/72x72.png
 # ============================
 # Build all
 # ============================
-all: prepare $(SEQ_EXEC) $(CUDA_EXEC)
+all: prepare $(MPI_EXEC) $(SEQ_EXEC) $(CUDA_EXEC) $(CUDA_SM_EXEC) $(MPI_OPT_EXEC) $(HYBRID_EXEC) $(TEXTON_HYBRID_EXEC)
 
 # Create build directory if missing
 prepare:
@@ -61,6 +75,14 @@ prepare:
 # ============================
 # Build targets
 # ============================
+$(MPI_EXEC): $(MPI_SRC)
+	$(MPICC)  -o $(MPI_EXEC) $(MPI_SRC) $(OPENCV)
+
+$(OMP_EXEC): $(MPI_SRC)
+	$(GCC) -fopenmp -o $(OMP_EXEC) $(OMP_SRC) $(OPENCV)
+
+$(MPI_OPT_EXEC): $(MPI_OPT_SRC)
+	$(MPICC)  -fopenmp -o $(MPI_OPT_EXEC) $(MPI_OPT_SRC) $(OPENCV)
 
 $(SEQ_EXEC): $(SEQ_SRC)
 	$(GCC)  -o $(SEQ_EXEC) $(SEQ_SRC) $(OPENCV)
@@ -68,16 +90,41 @@ $(SEQ_EXEC): $(SEQ_SRC)
 $(CUDA_EXEC): $(CUDA_SRC)
 	$(NVCC)  -arch=sm_60 -o $(CUDA_EXEC) $(CUDA_SRC) $(OPENCV)
 
+$(CUDA_SM_EXEC): $(SM_CUDA_SRC)
+	$(NVCC)  -arch=sm_60 -o $(CUDA_SM_EXEC) $(SM_CUDA_SRC) $(OPENCV)
+
+$(HYBRID_EXEC): $(HYBRID_SRC)
+	$(MPICC)  -fopenmp -o $(HYBRID_EXEC) $(HYBRID_SRC) $(OPENCV)
+
+$(TEXTON_HYBRID_EXEC): $(TEXTON_HYBRID_SRC)
+	$(MPICXX)  -std=c++17 -Wall -fopenmp -o $(TEXTON_HYBRID_EXEC) $(TEXTON_HYBRID_SRC) $(OPENCV)
+
 # ============================
 # Run targets
 # ============================
+run-mpi: $(MPI_EXEC)
+	mpirun -np $(CORE) ./$(MPI_EXEC) $(IMAGE)
+
+run-mpi-optimized: $(MPI_OPT_EXEC)
+	mpirun -np $(CORE) ./$(MPI_OPT_EXEC) $(IMAGE)
 
 run-serial: $(SEQ_EXEC)
 	./$(SEQ_EXEC) $(IMAGE)
 
+run-omp: $(OMP_EXEC)
+	./$(OMP_EXEC) $(IMAGE)
+
 run-cuda: $(CUDA_EXEC)
 	./$(CUDA_EXEC) $(IMAGE)
 
+run-cuda-shared: $(CUDA_SM_EXEC)
+	./$(CUDA_SM_EXEC) $(IMAGE)
+
+run-hybrid: $(HYBRID_EXEC)
+	mpirun -np $(CORE) ./$(HYBRID_EXEC) $(IMAGE)
+
+run-texton-hybrid: $(TEXTON_HYBRID_EXEC)
+	mpirun -np $(CORE) ./$(TEXTON_HYBRID_EXEC) $(IMAGE)
 
 # ============================
 # Clean target
@@ -86,6 +133,13 @@ clean:
 	rm -rf build
 	@mkdir -p build
 
+profile-mpi: $(MPI_EXEC)
+	@mkdir -p $(VTUNE_RESULT_DIR)
+	$(VTUNE) $(VTUNE_OPTS) -r $(VTUNE_RESULT_DIR)/mpi_profile mpirun -np $(CORE) ./$(MPI_EXEC) $(IMAGE)
+
+profile-mpi-optimized: $(MPI_OPT_EXEC)
+	@mkdir -p $(VTUNE_RESULT_DIR)
+	$(VTUNE) $(VTUNE_OPTS) -r $(VTUNE_RESULT_DIR)/mpi_optimized_profile mpirun -np $(CORE) ./$(MPI_OPT_EXEC) $(IMAGE)
 
 profile-hybrid: $(HYBRID_EXEC)
 	@mkdir -p $(VTUNE_RESULT_DIR)
